@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+
+<script>
+    function historyElementToText(history) {
+        return "User: \"" + history.username + "\" pick: \"" + history.pick + "\". Answer: " + history.result;
+    }
+
+    socket = io();
+    socket.on('newNumber', (number) => {
+        curNumEl.innerText = number.toString();
+    });
+    socket.on('updateUsers', (users) => {
+        onlineEl.innerHTML = "";
+        for(var user in users) {
+            onlineEl.innerHTML += "<p>nick: " + users[user].toString() + "</p>";
+        }
+    });
+    socket.on('history', (history) => {
+        historyEl.innerHTML += "<p>" + historyElementToText(history) + "</p>";
+    });
+    socket.emit('register', "<%= decoded %>");
+</script>
+
+<p>Number:  <div id="curNum"></div></p>
+
+<button onclick="socket.emit('normal')">other</button>
+<button onclick="socket.emit('fizz')">fizz</button>
+<button onclick="socket.emit('buzz')">buzz</button>
+<button onclick="socket.emit('fizzbuzz')">fizz-buzz</button>
+
+<p> Your nickname: <%=decoded%></p>
+<p> Users online: </p>
+<div id="online"></div>
+<p> History: </p>
+<div id="history"></div>
+
+<script>
+    curNumEl = document.getElementById('curNum');
+    onlineEl = document.getElementById('online');
+    historyEl = document.getElementById('history');
+</script>
+
+</body>
+</html>
